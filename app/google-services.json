@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "279782885706",
+    "project_id": "flashchat-4cde3",
+    "storage_bucket": "flashchat-4cde3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279782885706:android:ee1f63520a1b9cc8ff99b3",
+        "android_client_info": {
+          "package_name": "com.garmin.flashchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnb2Y43ZDFzDf6fYlfn3uNel8AfGhRYxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
