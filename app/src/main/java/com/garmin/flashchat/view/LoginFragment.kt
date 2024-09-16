@@ -28,7 +28,9 @@ class LoginFragment : Fragment() {
 
     private fun initViews(view: View) {
         emailEditText = view.findViewById(R.id.email_edit_text)
+        emailEditText?.setText("23@34.com")
         passwordEditText = view.findViewById(R.id.password_edit_text)
+        passwordEditText?.setText("123456")
         registerButton = view.findViewById(R.id.login_button)
         registerButton?.setOnClickListener {
             listener?.loginUser(emailEditText?.text.toString(), passwordEditText?.text.toString())

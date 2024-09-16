@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.garmin.flashchat" />
+                  <option name="mobileSdkAppId" value="1:279782885706:android:ee1f63520a1b9cc8ff99b3" />
+                  <option name="projectId" value="flashchat-4cde3" />
+                  <option name="projectNumber" value="279782885706" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

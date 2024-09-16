@@ -17,12 +17,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.garmin.flashchat.Constants
 import com.garmin.flashchat.R
 import com.garmin.flashchat.model.Message
 import com.garmin.flashchat.view.adapter.MessageAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-
 
 class ChatFragment : Fragment() {
 
@@ -30,6 +32,7 @@ class ChatFragment : Fragment() {
     private var messageEditText: EditText? = null
     private var sendMessageButton: Button? = null
     private var listener: IMainActivity? = null
+    private val db = Firebase.firestore
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_chat, container, false)
@@ -72,20 +75,60 @@ class ChatFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        val messages = ArrayList<Message>()
-        messages.add(Message("12@34.com", "Hi"))
-        messages.add(Message("1@2.com", "Hola"))
-        messages.add(Message("12@34.com", "Ciao"))
-        messages.add(Message("1@2.com", "Hi"))
-        messages.add(Message("12@34.com", "Hello"))
-
         messagesRecyclerView = view.findViewById(R.id.messages_recycler_view)
         messagesRecyclerView?.layoutManager = LinearLayoutManager(activity)
-        var adapter = MessageAdapter(activity, messages)
-        messagesRecyclerView?.adapter = adapter
+
+        loadMessages()
 
         messageEditText = view.findViewById(R.id.message_edit_text)
         sendMessageButton = view.findViewById(R.id.send_message_button)
+        sendMessageButton?.setOnClickListener {
+            val body = messageEditText?.text.toString()
+            val sender = Firebase.auth.currentUser?.email
+            if (body.isNotEmpty() && !sender.isNullOrEmpty()) {
+                val message = Message(sender, body)
+                saveMessage(message)
+            } else {
+                Log.e(TAG, "Message should not be empty!")
+            }
+            messageEditText?.setText("")
+        }
+    }
+
+    private fun updateRecyclerView(messages: List<Message>) {
+        val adapter = MessageAdapter(activity, messages)
+        messagesRecyclerView?.adapter = adapter
+    }
+
+    private fun saveMessage(message: Message) {
+        db.collection(Constants.collectionName).add(message)
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+    }
+
+    private fun loadMessages() {
+        db.collection(Constants.collectionName)
+            .orderBy(Constants.dateField)
+            .addSnapshotListener { value, error ->
+                val messages = mutableListOf<Message>()
+                error?.let { e ->
+                    Log.e(TAG, "Error retrieving data from Firestore: $e")
+                } ?: run {
+                    value?.let { snapshotDocuments ->
+                        snapshotDocuments.documents.forEach {
+                            val data = it.data
+                            val messageSender = data?.get(Constants.senderField) as? String
+                            val messageBody = data?.get(Constants.bodyField) as? String
+                            if (!messageSender.isNullOrEmpty() && !messageBody.isNullOrEmpty()) {
+                                val isMeAvatar = messageSender == Firebase.auth.currentUser?.email
+                                val newMessage = Message(messageSender, messageBody, isMeAvatar = isMeAvatar)
+                                messages.add(newMessage)
+                                updateRecyclerView(messages)
+                            }
+                        }
+                    }
+                }
+            }
     }
 
     companion object {
